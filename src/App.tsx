@@ -1,7 +1,7 @@
 import { useLazyQuery } from "@apollo/client";
 import { useEffect } from "react";
 import { GET_PHONE_LIST } from "./graphql/queries";
-import { MainLayout } from "./styles/02_containers/Layout";
+import MainLayout from "./containers/MainLayout";
 
 function App() {
   const get_list = {
@@ -21,7 +21,7 @@ function App() {
   return (
     <MainLayout>
       {data?.contact.map((val: any) => {
-        return <span>{val.first_name}</span>;
+        return <span key={val.id}>{val.first_name}</span>;
       })}
     </MainLayout>
   );

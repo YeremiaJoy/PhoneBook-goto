@@ -2,12 +2,12 @@
 
 import styled from '@emotion/styled'
 
-export const MainLayout = styled.div`
-  background-color: #262626;
+export const Main = styled.div`
+  background-color: var(--white);
   width: 100%;
-  max-width: 480px;
+  max-width: 960px;
+  word-break: break-all;
   margin: 0px auto;
   padding: 1em 16px 70px;
-  flex: 1 1 0%;
   min-width: 300px;
 `
