@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { useEffect } from "react";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useState, useEffect } from "react";
 import { GET_PHONE_LIST } from "@/graphql/queries";
 import { DELETE_PHONE_CONTACT } from "@/graphql/mutation";
 import MainLayout from "@/containers/shared/MainLayout";
@@ -18,32 +18,36 @@ import { faStar, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function PhoneListing() {
-  const get_list = {
-    limit: 20,
+  const [variables, setVariables] = useState({
+    limit: 10,
     offset: 0,
-  };
+  });
+
   //graphQL get data Pokemon List
   const { loading, data, refetch } = useQuery(GET_PHONE_LIST, {
-    variables: {
-      get_list,
-    },
+    variables,
   });
 
   // delete phone contact
-  const [deleteContact, deletion_data] = useMutation(DELETE_PHONE_CONTACT);
+  const [deleteContact] = useMutation(DELETE_PHONE_CONTACT, {
+    refetchQueries: [
+      GET_PHONE_LIST, // DocumentNode object parsed with gql
+      "GetContactList", // Query name
+    ],
+  });
 
   async function handleDelete(id: number) {
     await deleteContact({
       variables: { id },
+    }).then(({ data }) => {
+      const { first_name, last_name } = data.delete_contact_by_pk;
+      console.log(`${first_name} ${last_name}`);
     });
-
-    refetch();
-    console.log(deletion_data);
   }
 
   return (
     <MainLayout>
-      <AdvancedAction />
+      <AdvancedAction search={refetch} setVariables={setVariables} />
       <ListingCardContainer>
         {!loading &&
           data?.contact.map((contact: any) => {
