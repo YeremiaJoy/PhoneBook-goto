@@ -1,25 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useLazyQuery } from "@apollo/client";
+import { useEffect } from "react";
+import { GET_PHONE_LIST } from "./graphql/queries";
+import { MainLayout } from "./styles/02_containers/Layout";
 
 function App() {
+  const get_list = {
+    limit: 20,
+    offset: 0,
+  };
+  //graphQL get data Pokemon List
+  const [getPhoneList, { loading, data }] = useLazyQuery(GET_PHONE_LIST, {
+    variables: {
+      get_list,
+    },
+  });
+  useEffect(() => {
+    getPhoneList();
+  }, [getPhoneList, data]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MainLayout>
+      {data?.contact.map((val: any) => {
+        return <span>{val.first_name}</span>;
+      })}
+    </MainLayout>
   );
 }
 
