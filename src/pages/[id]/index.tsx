@@ -1,3 +1,3 @@
-export default function Details() {
-  return <div>details</div>;
+export default function EditPhoneContact() {
+  return <div>EditPhoneContact</div>;
 }

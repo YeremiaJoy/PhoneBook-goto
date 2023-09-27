@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require("webpack");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -19,6 +18,18 @@ module.exports = {
           "css-loader",
           // Compiles Sass to CSS
           "sass-loader",
+        ],
+      },
+      {
+        test: /\.(jpe?g|png|woff|woff2|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 10000,
+              name: "assets/[name].[ext]",
+            },
+          },
         ],
       },
       {
@@ -44,12 +55,12 @@ module.exports = {
       favicon: "./public/favicon.ico",
       manifest: "./public/manifest.json",
     }),
-    new webpack.HotModuleReplacementPlugin(),
   ],
   devServer: {
     static: {
       directory: path.join(__dirname, "dist"),
     },
     port: 3000,
+    hot: true,
   },
 };

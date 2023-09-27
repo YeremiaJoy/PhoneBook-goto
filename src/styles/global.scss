@@ -9,15 +9,17 @@ html,
 body {
   font-family: "Poppins", sans-serif;
   background-color: var(--white);
-  overflow: hidden;
   color: var(--text);
 }
 
 :root {
   --white: #fff;
   --primary: #00aa5b;
+  --primary-dark: #098a4e;
   --text: #212121;
+  --secondary-text: rgba(49, 53, 59, 0.68);
   --grey: #6d7588;
+  --yellow: #f3f328;
   --border-color: #bfc9d9;
 }
 
@@ -28,7 +30,6 @@ a {
 
 /* small tablet styles */
 @media screen and (min-width: 620px) {
-  
 }
 
 /* large tablet & desktop styles */
