@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-//LIST: get List of all Pokemon limited by limit and offset
 export const GET_PHONE_LIST = gql`
   query GetContactList(
     $distinct_on: [contact_select_column!]
