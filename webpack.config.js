@@ -1,6 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { webpack } = require("webpack");
+const webpack = require("webpack");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -34,14 +34,17 @@ module.exports = {
   },
   resolve: {
     extensions: [".*", ".js", ".jsx", ".ts", ".tsx"],
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "public", "index.html"),
-      filename: "./index.html",
       favicon: "./public/favicon.ico",
+      manifest: "./public/manifest.json",
     }),
-    // new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
   ],
   devServer: {
     static: {

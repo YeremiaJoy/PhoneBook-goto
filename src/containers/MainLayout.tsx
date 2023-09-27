@@ -1,5 +1,5 @@
 import React from "react";
-import { Main } from "../styles/02_containers/Layout";
+import { Main } from "@/styles/02_containers/Layout";
 
 export default function MainLayout({
   children,

@@ -20,7 +20,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "webpack serve --mode development",
+    "dev": "npm run open-browser && webpack serve --mode development",
+    "open-browser": "start http://localhost:3000",
     "build": "webpack --mode production"
   },
   "eslintConfig": {
