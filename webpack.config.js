@@ -4,8 +4,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   entry: "./src/index.tsx",
   output: {
-    filename: "main.js",
     path: path.resolve(__dirname, "dist"),
+    filename: "main.js",
+    publicPath: "/",
   },
   module: {
     rules: [
@@ -57,10 +58,8 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: {
-      directory: path.join(__dirname, "dist"),
-    },
     port: 3000,
     hot: true,
+    historyApiFallback: true,
   },
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/styles/01_components/Button";
-import { Input } from "@/styles/01_components/Input";
+import { Input } from "@/styles/01_components/Field";
 import { ActionContainer } from "@/styles/02_containers/AdvancedAction";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -37,6 +37,7 @@ export default function AdvancedAction({
       <div className="search">
         <Input
           name="search"
+          className="rounded-r"
           placeholder="Search by phone number"
           onChange={(event) => setPhoneNumber(event.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}

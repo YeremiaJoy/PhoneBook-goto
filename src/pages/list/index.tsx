@@ -1,5 +1,5 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@apollo/client";
+import { useState } from "react";
 import { GET_PHONE_LIST } from "@/graphql/queries";
 import { DELETE_PHONE_CONTACT } from "@/graphql/mutation";
 import MainLayout from "@/containers/shared/MainLayout";
@@ -8,22 +8,25 @@ import {
   BubbleContact,
   ContactContainer,
   ListingAction,
-  ListingCard,
   ListingCardContainer,
   ListingHeader,
   UserName,
 } from "@/styles/02_containers/ListingCard";
 import { formatDate } from "@/helpers/dateFormat";
-import { faStar, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faStar, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Card } from "@/styles/01_components/Card";
+import { useNavigate } from "react-router-dom";
 
 function PhoneListing() {
+  const navigate = useNavigate();
+
   const [variables, setVariables] = useState({
     limit: 10,
     offset: 0,
   });
 
-  //graphQL get data Pokemon List
+  //graphQL get contact list
   const { loading, data, refetch } = useQuery(GET_PHONE_LIST, {
     variables,
   });
@@ -36,6 +39,10 @@ function PhoneListing() {
     ],
   });
 
+  async function handleEdit(id: number) {
+    navigate(`/${id}`);
+  }
+
   async function handleDelete(id: number) {
     await deleteContact({
       variables: { id },
@@ -47,12 +54,13 @@ function PhoneListing() {
 
   return (
     <MainLayout>
+      <h2>Contact Listing</h2>
       <AdvancedAction search={refetch} setVariables={setVariables} />
       <ListingCardContainer>
         {!loading &&
           data?.contact.map((contact: any) => {
             return (
-              <ListingCard key={contact.id}>
+              <Card key={contact.id}>
                 <ListingHeader>
                   <UserName>
                     <FontAwesomeIcon
@@ -77,15 +85,20 @@ function PhoneListing() {
                       );
                     })}
                   </ContactContainer>
-                  <div className="delete">
+                  <div className="action">
+                    <FontAwesomeIcon
+                      icon={faEdit}
+                      color="var(--text)"
+                      onClick={() => handleEdit(contact.id)}
+                    />
                     <FontAwesomeIcon
                       icon={faTrashAlt}
-                      color="#ff6961"
+                      color="var(--danger)"
                       onClick={() => handleDelete(contact.id)}
                     />
                   </div>
                 </ListingAction>
-              </ListingCard>
+              </Card>
             );
           })}
       </ListingCardContainer>

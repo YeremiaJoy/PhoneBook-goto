@@ -19,4 +19,18 @@ export const Button = styled.button`
   &.rounded__right {
     border-radius: 0 8px 8px 0;
   }
+  &.button__light {
+    background-color: var(--white);
+    color: var(--text);
+    border: 1px solid var(--border-color);
+  }
+  &.button__danger {
+    background-color: var(--danger);
+    color: var(--white);
+  }
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
 `;

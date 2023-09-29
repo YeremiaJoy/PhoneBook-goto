@@ -1,3 +1,168 @@
+import MainLayout from "@/containers/shared/MainLayout";
+import { GET_CONTACT_DETAILS } from "@/graphql/queries";
+import { formatDate } from "@/helpers/dateFormat";
+import { Button, ButtonContainer } from "@/styles/01_components/Button";
+import { Card } from "@/styles/01_components/Card";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Formik, Form } from "formik";
+import { Contact } from "@/definitions/contact";
+import * as Yup from "yup";
+import InputField from "@/components/Field";
+import { FormContainer } from "@/styles/02_containers/Form";
+import DuplicableWrapper from "@/components/DuplicableWrapper";
+import { ADD_CONTACT_WITH_PHONES, EDIT_CONTACT } from "@/graphql/mutation";
+
+const DisplayingErrorMessagesSchema = Yup.object().shape({
+  first_name: Yup.string()
+    .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u, "Special character is not allowed")
+    .required("This field is mandatory"),
+  last_name: Yup.string()
+    .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u, "Special character is not allowed")
+    .required("This field is mandatory"),
+});
+
 export default function CreatePhoneContact() {
-  return <div>CreatePhoneContact</div>;
+  const params = useParams();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState<Contact>({
+    first_name: "",
+    last_name: "",
+    created_at: "",
+    phones: [{ number: "" }],
+  });
+  const isEditPage = params?.id;
+
+  //graphQL get contact list
+  const [fetchDetail] = useLazyQuery(GET_CONTACT_DETAILS, {
+    variables: {
+      id: isEditPage,
+    },
+  });
+
+  useEffect(() => {
+    if (isEditPage) {
+      fetchDetail().then((res) => {
+        const data = res.data.contact_by_pk;
+        if (data) {
+          setForm({ ...data, created_at: formatDate(data.created_at) });
+        } else {
+          goBack();
+        }
+      });
+    }
+  }, [form]);
+
+  function goBack() {
+    navigate("/");
+  }
+
+  // create contact with phone number
+  const [createContact] = useMutation(ADD_CONTACT_WITH_PHONES);
+  // delete phone contact
+  const [updateContact] = useMutation(EDIT_CONTACT);
+  const [updatePhoneNumber] = useMutation(EDIT_CONTACT);
+
+  async function handleCreate(contact: Contact) {
+    await createContact({
+      variables: contact,
+    }).then(({ data }) => {
+      if (data) {
+        goBack();
+      }
+    });
+  }
+  async function handleUpdate(contact: Contact) {
+    const { id, first_name, last_name, phones } = contact;
+    await updateContact({
+      variables: {
+        id,
+        _set: {
+          first_name,
+          last_name,
+        },
+      },
+    });
+    // await updatePhoneNumber({
+    //   variables: {
+    //     pk_columns: {
+    //       number: "+62817181718122",
+    //       contact_id: id,
+    //     },
+    //     new_phone_number: "+62818171817171wewe",
+    //   },
+    // });
+  }
+
+  function submitForm(value: Contact) {
+    if (isEditPage) {
+      handleUpdate(value);
+    } else {
+      handleCreate(value);
+    }
+  }
+  return (
+    <MainLayout>
+      <Card>
+        <div className="card shadow-md relative">
+          <h1 className="text-center">
+            {isEditPage ? "Edit" : "Create"} Contact
+          </h1>
+          <Formik
+            enableReinitialize={true}
+            initialValues={form}
+            validationSchema={DisplayingErrorMessagesSchema}
+            onSubmit={submitForm}
+          >
+            {({ values }) => (
+              <Form>
+                <FormContainer>
+                  <InputField
+                    label="First Name"
+                    name="first_name"
+                    placeholder="Input First Name"
+                  />
+                  <InputField
+                    label="Last Name"
+                    name="last_name"
+                    placeholder="Input Last Name"
+                  />
+                  <DuplicableWrapper
+                    label="Phones"
+                    name="phones"
+                    placeholder="Input Phone Number"
+                    value={values.phones}
+                  />
+
+                  {isEditPage && (
+                    <InputField
+                      label="Created At"
+                      name="created_at"
+                      value={values.created_at}
+                      disabled={true}
+                    />
+                  )}
+
+                  <ButtonContainer>
+                    <Button type="submit">
+                      {isEditPage ? "Update" : "Create"}
+                    </Button>
+                    <Button
+                      type="button"
+                      className="button__light"
+                      onClick={goBack}
+                    >
+                      Cancel
+                    </Button>
+                  </ButtonContainer>
+                </FormContainer>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </Card>
+    </MainLayout>
+  );
 }

@@ -8,13 +8,6 @@ export const ListingCardContainer = styled.section`
   flex-direction: column;
   gap: 1rem;
 `;
-
-export const ListingCard = styled.div`
-  padding: 1rem;
-  border: 1px solid #efefef;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-`;
 export const ListingHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -52,10 +45,17 @@ export const BubbleContact = styled.div`
 export const ListingAction = styled.div`
   display: grid;
   grid-template-columns: auto 20px;
-  .delete {
+  .action {
+    svg {
+      cursor: pointer;
+      &:first-of-type {
+        font-size: 14px;
+      }
+    }
     display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     justify-content: flex-end;
     align-items: flex-end;
-    cursor: pointer;
   }
 `;

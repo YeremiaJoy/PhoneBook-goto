@@ -5,11 +5,18 @@
   padding: 0;
   margin: 0;
 }
+
 html,
 body {
   font-family: "Poppins", sans-serif;
   background-color: var(--white);
   color: var(--text);
+}
+
+h1,
+h2,
+h3 {
+  margin-bottom: 1rem;
 }
 
 :root {
@@ -21,6 +28,7 @@ body {
   --grey: #6d7588;
   --yellow: #f3f328;
   --border-color: #bfc9d9;
+  --danger: #ff6961;
 }
 
 a {
