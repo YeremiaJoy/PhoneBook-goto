@@ -50,7 +50,11 @@ export default function DuplicableWrapper({
                 </div>
               ))}
             <RemoveButtonContainer>
-              <Button type="button" onClick={() => push({ number: "" })}>
+              <Button
+                type="button"
+                aria-label="Add More"
+                onClick={() => push({ number: "" })}
+              >
                 <FontAwesomeIcon icon={faPlus} /> Add More
               </Button>
             </RemoveButtonContainer>

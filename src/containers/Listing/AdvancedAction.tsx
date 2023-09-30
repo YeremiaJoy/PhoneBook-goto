@@ -30,7 +30,7 @@ export default function AdvancedAction({
   return (
     <ActionContainer>
       <Link to="/create">
-        <Button>
+        <Button aria-label="Create">
           <FontAwesomeIcon icon={faPlus} /> Create
         </Button>
       </Link>
@@ -42,7 +42,11 @@ export default function AdvancedAction({
           onChange={(event) => setPhoneNumber(event.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
-        <Button className="rounded__right" onClick={handleSearch}>
+        <Button
+          className="rounded__right"
+          aria-label="Search by phone number"
+          onClick={handleSearch}
+        >
           <FontAwesomeIcon icon={faSearch} />
         </Button>
       </div>

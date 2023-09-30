@@ -168,13 +168,19 @@ export default function CreatePhoneContact() {
                     />
                   )}
                   <ButtonContainer>
-                    <Button type="submit">
+                    <Button
+                      type="submit"
+                      aria-label={
+                        isEditPage ? "Update Contact" : "Create Contact"
+                      }
+                    >
                       {isEditPage ? "Update" : "Create"}
                     </Button>
                     <Button
                       type="button"
                       className="button__light"
                       onClick={goBack}
+                      aria-label="Cancel"
                     >
                       Cancel
                     </Button>

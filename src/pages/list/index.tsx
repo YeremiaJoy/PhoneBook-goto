@@ -4,18 +4,7 @@ import { GET_PHONE_LIST } from "@/graphql/queries";
 import { DELETE_PHONE_CONTACT } from "@/graphql/mutation";
 import MainLayout from "@/containers/shared/MainLayout";
 import AdvancedAction from "@/containers/Listing/AdvancedAction";
-import {
-  BubbleContact,
-  ContactContainer,
-  ListingAction,
-  ListingCardContainer,
-  ListingHeader,
-  UserName,
-} from "@/styles/02_containers/ListingCard";
-import { formatDate } from "@/helpers/dateFormat";
-import { faEdit, faStar, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Card } from "@/styles/01_components/Card";
+import { ListingCardContainer } from "@/styles/02_containers/ListingCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   PageOption,
@@ -24,12 +13,14 @@ import {
   PaginationWrapper,
 } from "@/styles/02_containers/Pagination";
 import { counterShowPage, generatePageOptions } from "@/helpers/pagination";
+import { Contact } from "@/definitions/contact";
+import ListingCard from "@/containers/Listing/ListingCard";
 
 function PhoneListing() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const perPage = 10;
+  const perPage = 1;
   const [variables, setVariables] = useState({
     limit: perPage,
     offset: 0,
@@ -46,12 +37,13 @@ function PhoneListing() {
   const pageOption: number[] = generatePageOptions(total, perPage, currentPage);
 
   async function changePage(page: number) {
+    if (page === currentPage) return;
     setCurrentPage(page);
-    setVariables({
+    const variables = {
       limit: perPage,
       offset: (page - 1) * perPage,
-    });
-    refetch();
+    };
+    setVariables(variables);
   }
 
   // Fetch listing every route changed
@@ -66,9 +58,10 @@ function PhoneListing() {
       "GetContactList", // Query name
     ],
   });
-  async function handleDelete(id: number) {
+  async function handleDelete(contact: Contact) {
+    handleFavorite(contact);
     await deleteContact({
-      variables: { id },
+      variables: { id: contact.id },
     }).then(({ data }) => {
       const { first_name, last_name } = data.delete_contact_by_pk;
       console.log(`${first_name} ${last_name}`);
@@ -80,53 +73,89 @@ function PhoneListing() {
     navigate(`/${id}`);
   }
 
+  // Favorite contact
+  const [favorite, setFavorite] = useState<Contact[]>([]);
+  const [currentData, setCurrentData] = useState<Contact[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setCurrentData(data.contact);
+      const favoriteItem = JSON.parse(
+        window.localStorage.getItem("favorite") || "[]"
+      );
+      removeDuplicateData(favoriteItem, data.contact);
+    }
+  }, [data]);
+
+  function removeDuplicateData(
+    favoriteData: Contact[],
+    currentData: Contact[],
+    found?: boolean,
+    item?: Contact
+  ) {
+    setFavorite(favoriteData);
+    const dataWithoutFavorite = currentData.reduce(
+      (acc: Contact[], curr: Contact) => {
+        const found = favoriteData.find((fav: Contact) => fav.id === curr.id);
+        if (!found) acc.push(curr);
+        return acc;
+      },
+      []
+    );
+
+    if (found && item) setCurrentData([...dataWithoutFavorite, item]);
+    else setCurrentData(dataWithoutFavorite);
+  }
+
+  function handleFavorite(contact: Contact) {
+    const favoriteData = JSON.parse(
+      window.localStorage.getItem("favorite") || "[]"
+    );
+    const found = favoriteData.filter(
+      (favorite: Contact) => favorite.id === contact.id
+    ).length;
+
+    let favoriteItem;
+    if (found) {
+      const isMatch = (item: Contact) => item.id === contact.id;
+      const index = favoriteData.findIndex(isMatch);
+      favoriteData.splice(index, 1);
+      favoriteItem = favoriteData;
+    } else {
+      favoriteItem = [...favoriteData, contact];
+    }
+    removeDuplicateData(favoriteItem, currentData, found, contact);
+    localStorage.setItem("favorite", JSON.stringify(favoriteItem));
+  }
+
   return (
     <MainLayout>
       <h2>Contact Listing</h2>
       <AdvancedAction search={refetch} setVariables={setVariables} />
       <ListingCardContainer>
-        {!loading &&
-          data?.contact.map((contact: any) => {
-            return (
-              <Card key={contact.id}>
-                <ListingHeader>
-                  <UserName>
-                    <FontAwesomeIcon
-                      className="favorite"
-                      icon={faStar}
-                      color="#262626"
-                    />
-                    <strong>{`${contact.first_name} ${contact.last_name} `}</strong>
-                  </UserName>
-                  <span className="created-at">
-                    ~created at {formatDate(contact.created_at)}
-                  </span>
-                </ListingHeader>
+        {favorite.map((favorite: any) => {
+          return (
+            <ListingCard
+              key={favorite.id}
+              contact={favorite}
+              handleFavorite={handleFavorite}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+              favorite
+            />
+          );
+        })}
 
-                <ListingAction>
-                  <ContactContainer>
-                    {contact.phones.map((phone: any) => {
-                      return (
-                        <BubbleContact key={phone.number}>
-                          {phone.number}
-                        </BubbleContact>
-                      );
-                    })}
-                  </ContactContainer>
-                  <div className="action">
-                    <FontAwesomeIcon
-                      icon={faEdit}
-                      color="var(--text)"
-                      onClick={() => handleEdit(contact.id)}
-                    />
-                    <FontAwesomeIcon
-                      icon={faTrashAlt}
-                      color="var(--danger)"
-                      onClick={() => handleDelete(contact.id)}
-                    />
-                  </div>
-                </ListingAction>
-              </Card>
+        {!loading &&
+          currentData.map((contact: any) => {
+            return (
+              <ListingCard
+                key={contact.id}
+                contact={contact}
+                handleFavorite={handleFavorite}
+                handleEdit={handleEdit}
+                handleDelete={handleDelete}
+              />
             );
           })}
       </ListingCardContainer>
