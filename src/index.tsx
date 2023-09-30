@@ -6,6 +6,7 @@ import "./styles/global.scss";
 
 import { ApolloProvider } from "@apollo/client";
 import client from "./apollo-client";
+import { Toaster } from "react-hot-toast";
 
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
@@ -14,6 +15,7 @@ root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <App />
+      <Toaster />
     </ApolloProvider>
   </React.StrictMode>
 );

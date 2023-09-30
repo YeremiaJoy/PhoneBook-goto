@@ -18,6 +18,7 @@ import {
   EDIT_CONTACT,
   EDIT_PHONE_NUMBER,
 } from "@/graphql/mutation";
+import toast from "react-hot-toast";
 
 const RequiredAndSpecialCharNotAllowed = Yup.string()
   .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u, "Special character is not allowed")
@@ -72,7 +73,7 @@ export default function CreatePhoneContact() {
   // create contact with phone number
   const [createContact] = useMutation(ADD_CONTACT_WITH_PHONES);
   const [addPhoneNumber] = useMutation(ADD_NUMBER_TO_CONTACT);
-  // delete phone contact
+  // edit phone contact
   const [updateContact] = useMutation(EDIT_CONTACT);
   const [updatePhoneNumber] = useMutation(EDIT_PHONE_NUMBER);
 
@@ -81,12 +82,16 @@ export default function CreatePhoneContact() {
       variables: contact,
     }).then(({ data }) => {
       if (data) {
+        toast.success("Contact succesfully created");
         goBack();
+      } else {
+        toast.error("The phone number is already in use by another contact");
       }
     });
   }
   async function handleUpdate(contact: Contact) {
     const { id, first_name, last_name, phones } = contact;
+    var error = false;
     await updateContact({
       variables: {
         id,
@@ -96,9 +101,11 @@ export default function CreatePhoneContact() {
         },
       },
     });
-    phones.forEach((phone: Phones, idx: number) => {
+    // phones.forEach((phone: Phones, idx: number) => {
+    for (let idx = 0; idx < phones.length; idx++) {
+      const phone = phones[idx];
       if (oldPhoneNumber[idx]) {
-        updatePhoneNumber({
+        await updatePhoneNumber({
           variables: {
             pk_columns: {
               number: oldPhoneNumber[idx].number,
@@ -106,18 +113,35 @@ export default function CreatePhoneContact() {
             },
             new_phone_number: phone.number,
           },
+          // eslint-disable-next-line no-loop-func
+        }).then(({ data }) => {
+          if (!data) {
+            error = true;
+            return;
+          }
         });
       } else {
-        addPhoneNumber({
+        await addPhoneNumber({
           variables: {
             contact_id: id,
             phone_number: phone.number,
           },
+          // eslint-disable-next-line no-loop-func
+        }).then(({ data }) => {
+          if (!data) {
+            error = true;
+            return;
+          }
         });
       }
-    });
+    }
 
-    goBack();
+    if (error) {
+      toast.error("The phone number is already in use by another contact");
+    } else {
+      toast.success("Contact succesfully updated");
+      goBack();
+    }
   }
 
   function submitForm(value: Contact) {

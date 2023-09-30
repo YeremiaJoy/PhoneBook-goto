@@ -59,3 +59,13 @@ export const ListingAction = styled.div`
     align-items: flex-end;
   }
 `;
+export const NoData = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 4rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+`;

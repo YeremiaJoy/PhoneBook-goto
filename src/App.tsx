@@ -1,13 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Loading from "./containers/shared/Loading";
 const PhoneListing = React.lazy(() => import("./pages/list"));
 const PhoneCreate = React.lazy(() => import("./pages/create"));
 
-// source https://blog.devgenius.io/implementing-react-router-v6-with-code-splitting-in-a-react-typescript-project-14d98e2cab79
-
 function App() {
-  const Loading = () => <p>Loading ...</p>;
-
   return (
     <React.Suspense fallback={<Loading />}>
       <Router>
