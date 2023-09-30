@@ -7,26 +7,35 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
-import { Contact } from "@/definitions/contact";
+import { Contact, Phones } from "@/definitions/contact";
 import * as Yup from "yup";
 import InputField from "@/components/Field";
 import { FormContainer } from "@/styles/02_containers/Form";
 import DuplicableWrapper from "@/components/DuplicableWrapper";
-import { ADD_CONTACT_WITH_PHONES, EDIT_CONTACT } from "@/graphql/mutation";
+import {
+  ADD_CONTACT_WITH_PHONES,
+  ADD_NUMBER_TO_CONTACT,
+  EDIT_CONTACT,
+  EDIT_PHONE_NUMBER,
+} from "@/graphql/mutation";
 
+const RequiredAndSpecialCharNotAllowed = Yup.string()
+  .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u, "Special character is not allowed")
+  .required("This field is mandatory");
 const DisplayingErrorMessagesSchema = Yup.object().shape({
-  first_name: Yup.string()
-    .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u, "Special character is not allowed")
-    .required("This field is mandatory"),
-  last_name: Yup.string()
-    .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u, "Special character is not allowed")
-    .required("This field is mandatory"),
+  first_name: RequiredAndSpecialCharNotAllowed,
+  last_name: RequiredAndSpecialCharNotAllowed,
 });
 
 export default function CreatePhoneContact() {
   const params = useParams();
   const navigate = useNavigate();
 
+  const [oldPhoneNumber, setOldPhoneNumber] = useState<Phones[]>([
+    {
+      number: "",
+    },
+  ]);
   const [form, setForm] = useState<Contact>({
     first_name: "",
     last_name: "",
@@ -48,12 +57,13 @@ export default function CreatePhoneContact() {
         const data = res.data.contact_by_pk;
         if (data) {
           setForm({ ...data, created_at: formatDate(data.created_at) });
+          setOldPhoneNumber(data.phones);
         } else {
           goBack();
         }
       });
     }
-  }, [form]);
+  }, []);
 
   function goBack() {
     navigate("/");
@@ -61,9 +71,10 @@ export default function CreatePhoneContact() {
 
   // create contact with phone number
   const [createContact] = useMutation(ADD_CONTACT_WITH_PHONES);
+  const [addPhoneNumber] = useMutation(ADD_NUMBER_TO_CONTACT);
   // delete phone contact
   const [updateContact] = useMutation(EDIT_CONTACT);
-  const [updatePhoneNumber] = useMutation(EDIT_CONTACT);
+  const [updatePhoneNumber] = useMutation(EDIT_PHONE_NUMBER);
 
   async function handleCreate(contact: Contact) {
     await createContact({
@@ -85,15 +96,28 @@ export default function CreatePhoneContact() {
         },
       },
     });
-    // await updatePhoneNumber({
-    //   variables: {
-    //     pk_columns: {
-    //       number: "+62817181718122",
-    //       contact_id: id,
-    //     },
-    //     new_phone_number: "+62818171817171wewe",
-    //   },
-    // });
+    phones.forEach((phone: Phones, idx: number) => {
+      if (oldPhoneNumber[idx]) {
+        updatePhoneNumber({
+          variables: {
+            pk_columns: {
+              number: oldPhoneNumber[idx].number,
+              contact_id: id,
+            },
+            new_phone_number: phone.number,
+          },
+        });
+      } else {
+        addPhoneNumber({
+          variables: {
+            contact_id: id,
+            phone_number: phone.number,
+          },
+        });
+      }
+    });
+
+    goBack();
   }
 
   function submitForm(value: Contact) {
@@ -135,7 +159,6 @@ export default function CreatePhoneContact() {
                     placeholder="Input Phone Number"
                     value={values.phones}
                   />
-
                   {isEditPage && (
                     <InputField
                       label="Created At"
@@ -144,7 +167,6 @@ export default function CreatePhoneContact() {
                       disabled={true}
                     />
                   )}
-
                   <ButtonContainer>
                     <Button type="submit">
                       {isEditPage ? "Update" : "Create"}

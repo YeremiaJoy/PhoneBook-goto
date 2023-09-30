@@ -35,13 +35,14 @@ export default function DuplicableWrapper({
                       type="text"
                       disabled={disabled}
                     />
-                    <Button
+                    {/* Delete button was hidden because there is no requirement to delete phone number */}
+                    {/* <Button
                       type="button"
                       className="button__danger"
                       onClick={() => remove(index)}
                     >
                       <FontAwesomeIcon icon={faTrashAlt} />
-                    </Button>
+                    </Button> */}
                   </div>
                   <MessageDanger>
                     <ErrorMessage name={`${name}.${index}.number`} />
@@ -50,7 +51,7 @@ export default function DuplicableWrapper({
               ))}
             <RemoveButtonContainer>
               <Button type="button" onClick={() => push({ number: "" })}>
-                <FontAwesomeIcon icon={faPlus} /> Add
+                <FontAwesomeIcon icon={faPlus} /> Add More
               </Button>
             </RemoveButtonContainer>
           </DuplicableInputContainer>

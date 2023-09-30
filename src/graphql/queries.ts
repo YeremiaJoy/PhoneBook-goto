@@ -8,7 +8,7 @@ export const GET_PHONE_LIST = gql`
     $order_by: [contact_order_by!]
     $where: contact_bool_exp
   ) {
-    contact_aggregate {
+    contact_aggregate(where: $where) {
       aggregate {
         count
       }
