@@ -1,10 +1,13 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
+const mode = process.env.NODE_ENV || "development";
+
 module.exports = {
   entry: "./src/index.tsx",
+  devtool: mode === "development" ? "inline-source-map" : false,
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "build"),
     filename: "main.js",
     publicPath: "/",
   },
