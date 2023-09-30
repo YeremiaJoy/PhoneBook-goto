@@ -1,18 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Button } from "@/styles/01_components/Button";
 import { Input } from "@/styles/01_components/Field";
 import { ActionContainer } from "@/styles/02_containers/AdvancedAction";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
+import { VariablesListingContext } from "@/helpers/context";
 
-export default function AdvancedAction({
-  search,
-  setVariables,
-}: {
-  search: Function;
-  setVariables: Function;
-}) {
+export default function AdvancedAction({ search }: { search: Function }) {
+  const { setVariables } = useContext(VariablesListingContext);
+
   const [phoneNumber, setPhoneNumber] = useState<string>("");
 
   async function handleSearch() {
@@ -23,6 +20,7 @@ export default function AdvancedAction({
         },
       },
     };
+
     await setVariables(phoneNumber ? searchByPhoneNumber : {});
     search();
   }

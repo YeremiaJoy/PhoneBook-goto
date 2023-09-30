@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { GET_PHONE_LIST } from "@/graphql/queries";
 import { DELETE_PHONE_CONTACT } from "@/graphql/mutation";
 import MainLayout from "@/containers/shared/MainLayout";
@@ -19,36 +19,22 @@ import { counterShowPage, generatePageOptions } from "@/helpers/pagination";
 import { Contact } from "@/definitions/contact";
 import ListingCard from "@/containers/Listing/ListingCard";
 import toast from "react-hot-toast";
+import Pagination from "@/containers/Listing/Pagination";
+import { VariablesListingContext } from "@/helpers/context";
 
 function PhoneListing() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const perPage = 10;
-  const [variables, setVariables] = useState({
-    limit: perPage,
-    offset: 0,
-  });
+  const { variables, setVariables } = useContext(VariablesListingContext);
+
   //graphQL get contact list
   const { loading, data, refetch } = useQuery(GET_PHONE_LIST, {
     variables,
   });
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  // total data
   const total = data?.contact_aggregate.aggregate.count;
-
-  const pageOption: number[] = generatePageOptions(total, perPage, currentPage);
-
-  async function changePage(page: number) {
-    if (page === currentPage) return;
-    setCurrentPage(page);
-    const variables = {
-      limit: perPage,
-      offset: (page - 1) * perPage,
-    };
-    setVariables(variables);
-  }
 
   // Fetch listing every route changed
   useEffect(() => {
@@ -137,7 +123,7 @@ function PhoneListing() {
   return (
     <MainLayout>
       <h2>Contact Listing</h2>
-      <AdvancedAction search={refetch} setVariables={setVariables} />
+      <AdvancedAction search={refetch} />
       <ListingCardContainer>
         {!favorite.length && !currentData.length && (
           <NoData>No Result Found</NoData>
@@ -169,25 +155,7 @@ function PhoneListing() {
           })}
       </ListingCardContainer>
 
-      <PaginationWrapper>
-        <PageOptionContainer>
-          {pageOption?.map((page: number) => {
-            return (
-              <PageOption
-                key={page}
-                className={page === currentPage ? "active" : ""}
-                onClick={() => changePage(page)}
-              >
-                {page}
-              </PageOption>
-            );
-          })}
-        </PageOptionContainer>
-
-        <PageShow>
-          Show {counterShowPage(perPage, currentPage, total)} per {total}
-        </PageShow>
-      </PaginationWrapper>
+      <Pagination total={total} />
     </MainLayout>
   );
 }
