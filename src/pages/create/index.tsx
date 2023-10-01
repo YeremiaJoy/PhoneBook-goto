@@ -180,6 +180,7 @@ export default function CreatePhoneContact() {
                   <DuplicableWrapper
                     label="Phones"
                     name="phones"
+                    field="number"
                     placeholder="Input Phone Number"
                     value={values.phones}
                   />

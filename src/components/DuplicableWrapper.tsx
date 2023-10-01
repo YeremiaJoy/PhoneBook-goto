@@ -15,6 +15,7 @@ export default function DuplicableWrapper({
   name,
   placeholder,
   value,
+  field,
   disabled,
 }: InputFieldType) {
   return (
@@ -29,8 +30,8 @@ export default function DuplicableWrapper({
                   <div className="field">
                     <Field
                       as={Input}
-                      id={`${name}-${index}`}
-                      name={`${name}-${index}`}
+                      id={`${name}.${index}${field ? `.${field}` : ""}`}
+                      name={`${name}.${index}${field ? `.${field}` : ""}`}
                       placeholder={placeholder}
                       type="text"
                       disabled={disabled}
@@ -45,7 +46,9 @@ export default function DuplicableWrapper({
                     </Button> */}
                   </div>
                   <MessageDanger>
-                    <ErrorMessage name={`${name}-${index}`} />
+                    <ErrorMessage
+                      name={`${name}.${index}${field ? `.${field}` : ""}`}
+                    />
                   </MessageDanger>
                 </div>
               ))}
