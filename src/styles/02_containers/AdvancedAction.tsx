@@ -8,6 +8,9 @@ export const ActionContainer = styled.section`
   @media screen and (max-width: 620px) {
     grid-template-columns: auto;
     gap: 0.5rem;
+    a {
+      width: fit-content;
+    }
     .search input {
       width: 100%;
     }

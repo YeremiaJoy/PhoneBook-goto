@@ -9,24 +9,16 @@ import {
   NoData,
 } from "@/styles/02_containers/ListingCard";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  PageOption,
-  PageOptionContainer,
-  PageShow,
-  PaginationWrapper,
-} from "@/styles/02_containers/Pagination";
-import { counterShowPage, generatePageOptions } from "@/helpers/pagination";
 import { Contact } from "@/definitions/contact";
 import ListingCard from "@/containers/Listing/ListingCard";
 import toast from "react-hot-toast";
 import Pagination from "@/containers/Listing/Pagination";
 import { VariablesListingContext } from "@/helpers/context";
-
 function PhoneListing() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { variables, setVariables } = useContext(VariablesListingContext);
+  const { variables } = useContext(VariablesListingContext);
 
   //graphQL get contact list
   const { loading, data, refetch } = useQuery(GET_PHONE_LIST, {

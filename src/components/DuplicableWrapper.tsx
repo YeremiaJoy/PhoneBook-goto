@@ -29,8 +29,8 @@ export default function DuplicableWrapper({
                   <div className="field">
                     <Field
                       as={Input}
-                      id={`${name}.${index}.number`}
-                      name={`${name}.${index}.number`}
+                      id={`${name}-${index}`}
+                      name={`${name}-${index}`}
                       placeholder={placeholder}
                       type="text"
                       disabled={disabled}
@@ -45,7 +45,7 @@ export default function DuplicableWrapper({
                     </Button> */}
                   </div>
                   <MessageDanger>
-                    <ErrorMessage name={`${name}.${index}.number`} />
+                    <ErrorMessage name={`${name}-${index}`} />
                   </MessageDanger>
                 </div>
               ))}

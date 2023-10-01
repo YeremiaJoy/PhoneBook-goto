@@ -24,9 +24,6 @@ export const UserName = styled.div`
     margin-right: 4px;
     font-size: 12px;
     cursor: pointer;
-    &:hover {
-      color: var(--yellow);
-    }
   }
 `;
 export const ContactContainer = styled.div`
